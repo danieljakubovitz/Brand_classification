@@ -6,15 +6,6 @@ import os
 from sklearn.metrics import f1_score, confusion_matrix, accuracy_score, matthews_corrcoef
 
 
-# transform image from 3 channels to 1 channel
-def transform_to_one_channel(image):
-    assert len(np.shape(image)) == 3  # only accept 3-channel images
-    image = image[:, :, 0]  # take the non-corrupt blue channel, BGR in cv2
-    image.astype(np.uint8)
-    image = np.expand_dims(image, axis=(0, 3))
-    return image
-
-
 # load dataset using csv file, data_dir and classes dictionary
 def load_dataset(csv_file, data_dir, cls_dict):
     print("Loading images and creating train and test sets...", flush=True)
@@ -26,18 +17,16 @@ def load_dataset(csv_file, data_dir, cls_dict):
 
     num_classes = len(cls_dict)
     image_names = sorted(os.listdir(data_dir))
-    for image_num, image_name in enumerate(tqdm(image_names)): # read images
+    for image_num, image_name in enumerate(tqdm(image_names)):  # read images
         image_path = os.path.join(data_dir, image_name)
         image = cv2.imread(image_path)
         if image is None:
             raise Exception("image %s is None, there was an error while loading" % image_path)
-
-        # convert image to 1 channel - blue #
-        image_1_channel = transform_to_one_channel(image)
+        image = np.expand_dims(image, axis=0)
 
         # initialize dataset arrays #
         if image_num == 0:
-            H, W, C = np.shape(image_1_channel)[1:]
+            H, W, C = np.shape(image)[1:]
             dataset_images = np.zeros((0, H, W, C))
             dataset_labels = np.zeros((0, num_classes))
 
@@ -46,7 +35,7 @@ def load_dataset(csv_file, data_dir, cls_dict):
         label[:, cls_dict[image_label_dict[image_name]]] = 1
 
         # aggregate to dataset #
-        dataset_images = np.concatenate((dataset_images, image_1_channel), axis=0)
+        dataset_images = np.concatenate((dataset_images, image), axis=0)
         dataset_labels = np.concatenate((dataset_labels, label), axis=0)
     return dataset_images, dataset_labels
 

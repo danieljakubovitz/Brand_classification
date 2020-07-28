@@ -1,9 +1,8 @@
-# first, import some necessary libraries #
 import os
 import numpy as np
 import tensorflow as tf
 import keras
-from keras.layers import Concatenate, Dense, Input, Flatten
+from keras.layers import Dense, Input, Flatten
 from sklearn.model_selection import train_test_split
 import time
 from utils import load_dataset, get_class_weighting, get_model_performance
@@ -14,11 +13,17 @@ def main(test_ratio, initial_learning_rate, num_classes, num_training_epochs, cl
     start_time = time.time()  # run-time evaluation
 
     # csv file full path, and images dir full puth
+    csv_file = None
+    data_dir = None
     for file in os.listdir(baseline_dir):
         if file.endswith("csv"):
             csv_file = os.path.join(baseline_dir, file)
         if os.path.isdir(os.path.join(baseline_dir, file)):
             data_dir = os.path.join(baseline_dir, file)
+    if csv_file is None:
+        raise Exception("no csv_file was found")
+    if data_dir is None:
+        raise Exception("no data_dir was found")
 
     # get all relevant data #
     dataset_images, dataset_labels = load_dataset(csv_file=csv_file,
@@ -36,40 +41,38 @@ def main(test_ratio, initial_learning_rate, num_classes, num_training_epochs, cl
                                                         shuffle=True)
 
     # TRAIN A DNN FOR 3 CLASS CLASSIFICATION #
-    DNN_model = keras.Sequential(name="full_DNN")
-    DNN_model_input = Input(shape=(H,W,1), name="DNN_model_input")
-    # input is concatenated 3 times along channel axis #
-    concat_input = Concatenate(axis=3)([DNN_model_input, DNN_model_input, DNN_model_input])
+    dnn_model = keras.Sequential(name="full_DNN")
+    dnn_model_input = Input(shape=(H,W,3), name="dnn_model_input")
 
     # use VGG16 model with imagenet weights as baseline #
-    init_DNN_model = keras.applications.VGG16(
+    init_dnn_model = keras.applications.VGG16(
                                 include_top=False,
-                                input_tensor=concat_input,
+                                input_tensor=dnn_model_input,
                                 weights="imagenet",
                                 input_shape=(H, W, 3),
                             )
 
     # add fully connected layers in the end of the network #
-    DNN_model.add(init_DNN_model)
-    DNN_model.add(Flatten(name="flatten1"))  # make sure output is flat before FC layers
-    DNN_model.add(Dense(units=1024, activation="relu", name="FC1",
-                    kernel_regularizer=tf.keras.regularizers.l1_l2(l1=1e-8, l2=1e-8),
-                    bias_regularizer=tf.keras.regularizers.l2(1e-8),
-                    ))
-    DNN_model.add(Dense(256, activation="relu", name="FC2",
-                    kernel_regularizer=tf.keras.regularizers.l1_l2(l1=1e-8, l2=1e-8),
-                    bias_regularizer=tf.keras.regularizers.l2(1e-8),
-                    ))
-    DNN_model.add(Dense(num_classes, activation="softmax", name="FC3",
-                    kernel_regularizer=tf.keras.regularizers.l1_l2(l1=1e-8, l2=1e-8),
-                    bias_regularizer=tf.keras.regularizers.l2(1e-8),
+    dnn_model.add(init_dnn_model)
+    dnn_model.add(Flatten(name="flatten1"))  # make sure output is flat before FC layers
+    dnn_model.add(Dense(units=1024, activation="relu", name="FC1",
+                        kernel_regularizer=tf.keras.regularizers.l1_l2(l1=1e-8, l2=1e-8),
+                        bias_regularizer=tf.keras.regularizers.l2(1e-8),
+                        ))
+    dnn_model.add(Dense(256, activation="relu", name="FC2",
+                        kernel_regularizer=tf.keras.regularizers.l1_l2(l1=1e-8, l2=1e-8),
+                        bias_regularizer=tf.keras.regularizers.l2(1e-8),
+                        ))
+    dnn_model.add(Dense(num_classes, activation="softmax", name="FC3",
+                        kernel_regularizer=tf.keras.regularizers.l1_l2(l1=1e-8, l2=1e-8),
+                        bias_regularizer=tf.keras.regularizers.l2(1e-8),
                     ))
 
     # user Adam optmizer for speedy learning #
     optimizer = keras.optimizers.Adam(learning_rate=initial_learning_rate)
-    DNN_model.compile(loss='categorical_crossentropy',
-                  optimizer=optimizer,
-                  metrics=['categorical_accuracy'])
+    dnn_model.compile(loss='categorical_crossentropy',
+                      optimizer=optimizer,
+                      metrics=['categorical_accuracy'])
 
     # get train and test sample weighting, according to class imbalance
     train_sample_weights = 100 * get_class_weighting(labels=Y_train,
@@ -77,8 +80,8 @@ def main(test_ratio, initial_learning_rate, num_classes, num_training_epochs, cl
     test_sample_weights = get_class_weighting(labels=Y_test,
                                               num_classes_for_weighting=num_classes)
 
-    print("Starting DNN_model training...")
-    DNN_model.fit(
+    print("Starting dnn_model training...")
+    dnn_model.fit(
         x=X_train,
         y=Y_train,
         batch_size=32,
@@ -94,15 +97,15 @@ def main(test_ratio, initial_learning_rate, num_classes, num_training_epochs, cl
     dest_dir = "saved_model"
     os.makedirs(dest_dir, exist_ok=True)
     print("Saving trained DNN model to \"saved_model\" directory..")
-    DNN_model.save(os.path.join(dest_dir, "DNN_model.h5"))
+    dnn_model.save(os.path.join(dest_dir, "dnn_model.h5"))
 
     # evaluate classifier #
-    model_stats = get_model_performance(model_to_test=DNN_model,
+    model_stats = get_model_performance(model_to_test=dnn_model,
                                         x_to_test=X_test,
                                         y_to_test=Y_test,
                                         sample_weighting=test_sample_weights)
 
-    print("DNN model performance:")
+    print("DNN model TEST performance:")
     for key, val in model_stats.items():
         print("{}: {}".format(key, val))
 

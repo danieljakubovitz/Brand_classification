@@ -13,20 +13,20 @@ def main(*args):
             raise SyntaxError("path of image to predict isn't specified.")
 
         # load models
-        DNN_model = predict.load_models(input_dir="artifacts")
+        dnn_model = predict.load_models(input_dir="saved_model")
         # load image and its metadata
-        image, card_id, background_id, image_id = predict.load_image(image_path=args[2])
+        image = predict.load_image(image_path=args[2])
         # predict image class
         predict.predict_on_image(image=image,
-                                 DNN_model=DNN_model)
+                                 dnn_model=dnn_model)
     # training mode
     elif mode in ["train", "-train"]:
         if len(args) < 3:
             raise SyntaxError("path of dataset directory for training isn't specified.")
         train.main(test_ratio=0.1,
-                   initial_learning_rate=1e-4,
+                   initial_learning_rate=5e-5,
                    num_classes=3,
-                   num_training_epochs=10,
+                   num_training_epochs=15,
                    classes_dict={"CLASS_0": 0,
                                  "CLASS_1": 1,
                                  "CLASS_2": 2},
