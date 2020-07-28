@@ -4,11 +4,12 @@ from tqdm import tqdm
 import numpy as np
 import os
 from sklearn.metrics import f1_score, confusion_matrix, accuracy_score, matthews_corrcoef
+import logging
 
 
 # load dataset using csv file, data_dir and classes dictionary
 def load_dataset(csv_file, data_dir, cls_dict):
-    logging.info("Loading images and creating train and test sets...", flush=True)
+    logging.info("Loading images and creating train and test sets...")
     image_label_dict = {}  # create a dictionary mapping image name to label
     with open(csv_file, 'r') as csv_file_f:  # read csv file
         csv_file_reader = csv.DictReader(csv_file_f)
