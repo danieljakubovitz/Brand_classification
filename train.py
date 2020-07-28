@@ -59,11 +59,11 @@ def main(test_ratio, initial_learning_rate, num_classes, num_training_epochs, cl
                         kernel_regularizer=tf.keras.regularizers.l1_l2(l1=1e-8, l2=1e-8),
                         bias_regularizer=tf.keras.regularizers.l2(1e-8),
                         ))
-    dnn_model.add(Dense(256, activation="relu", name="FC2",
+    dnn_model.add(Dense(units=256, activation="relu", name="FC2",
                         kernel_regularizer=tf.keras.regularizers.l1_l2(l1=1e-8, l2=1e-8),
                         bias_regularizer=tf.keras.regularizers.l2(1e-8),
                         ))
-    dnn_model.add(Dense(num_classes, activation="softmax", name="FC3",
+    dnn_model.add(Dense(units=num_classes, activation="softmax", name="FC3",
                         kernel_regularizer=tf.keras.regularizers.l1_l2(l1=1e-8, l2=1e-8),
                         bias_regularizer=tf.keras.regularizers.l2(1e-8),
                     ))
