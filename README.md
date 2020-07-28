@@ -1,3 +1,4 @@
+## General
 This repo includes a generic 3-class classification model (easily extendable to more classes).
 It includes the training of a DNN, using transfer learning from VGG-16 initialized with ImageNet.
 Sample loss weighting is incorporated to mitigate class imbalance during training.
@@ -12,14 +13,15 @@ All training and test data should be aggregated in a directory, along with a csv
 The data directory should include the csv file and an "images" directory with the images themselves.
 The dictionary classes_dict in the main file should match the classes in the dataset csv file.
 
-Training:
+### Training:
 python main.py -train data_directory_path
 
 The saved model will appear in a "saved_model" directory.
 
-Inference:
+### Inference:
 python main.py -predict image_to_predict_path
 
+### Evaluation metrics
 The trained model is evaluated using the following metrics:
 1. micro F1 score: representing the global F1 score of all the samples.
 2. macro F1 score: the unweighted average of the different classes' F1 scores.
