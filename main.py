@@ -21,14 +21,16 @@ def main(*args):
                                  DNN_model=DNN_model)
     # training mode
     elif mode in ["train", "-train"]:
+        if len(args) < 3:
+            raise SyntaxError("path of dataset directory for training isn't specified.")
         train.main(test_ratio=0.1,
                    initial_learning_rate=1e-4,
                    num_classes=3,
                    num_training_epochs=10,
-                   classes_dict={"BRAND_0": 0,
-                                 "BRAND_1": 1,
-                                 "BRAND_2": 2},
-                   baseline_dir="data")
+                   classes_dict={"CLASS_0": 0,
+                                 "CLASS_1": 1,
+                                 "CLASS_2": 2},
+                   baseline_dir=args[2])
 
     # illegal mode
     else:

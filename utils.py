@@ -22,7 +22,7 @@ def load_dataset(csv_file, data_dir, cls_dict):
     with open(csv_file, 'r') as csv_file_f:  # read csv file
         csv_file_reader = csv.DictReader(csv_file_f)
         for row in csv_file_reader:
-            image_label_dict[row["IMAGE_FILENAME"].strip()] = row[" LABEL"].strip()
+            image_label_dict[row["IMAGE_FILENAME"].strip()] = row["LABEL"].strip()
 
     num_classes = len(cls_dict)
     image_names = sorted(os.listdir(data_dir))

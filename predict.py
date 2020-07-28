@@ -4,9 +4,9 @@ import cv2
 from keras.models import load_model
 import numpy as np
 
-classes_dict = {0: "BRAND_0",
-                1: "BRAND_1",
-                2: "BRAND_2"}
+classes_dict = {0: "CLASS_0",
+                1: "CLASS_1",
+                2: "CLASS_2"}
 
 # load all models relevant to prediction #
 def load_models(input_dir):

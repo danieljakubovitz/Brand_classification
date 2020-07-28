@@ -14,8 +14,11 @@ def main(test_ratio, initial_learning_rate, num_classes, num_training_epochs, cl
     start_time = time.time()  # run-time evaluation
 
     # csv file full path, and images dir full puth
-    csv_file = os.path.join(baseline_dir, "gicsd_labels.csv")
-    data_dir = os.path.join(baseline_dir, "images")
+    for file in os.listdir(baseline_dir):
+        if file.endswith("csv"):
+            csv_file = os.path.join(baseline_dir, file)
+        if os.path.isdir(os.path.join(baseline_dir, file)):
+            data_dir = os.path.join(baseline_dir, file)
 
     # get all relevant data #
     dataset_images, dataset_labels = load_dataset(csv_file=csv_file,
@@ -88,10 +91,9 @@ def main(test_ratio, initial_learning_rate, num_classes, num_training_epochs, cl
     )
 
     # save trained DNN model #
-    dest_dir = "artifacts"
-    if not os.path.exists(dest_dir):
-        os.makedirs(dest_dir)
-    print("Saving trained DNN model to artifacts directory..")
+    dest_dir = "saved_model"
+    os.makedirs(dest_dir, exist_ok=True)
+    print("Saving trained DNN model to \"saved_model\" directory..")
     DNN_model.save(os.path.join(dest_dir, "DNN_model.h5"))
 
     # evaluate classifier #
