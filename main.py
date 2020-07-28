@@ -1,12 +1,17 @@
 import sys
 import predict
 import train
+import logging
 
 
 # main run function
 def main(*args):
     args = args[0]
     mode = args[1]
+
+    # start logging
+    logging.basicConfig(level=logging.DEBUG)
+
     # prediction mode
     if mode in ["predict", "-predict"]:
         if len(args) < 3:
@@ -14,11 +19,15 @@ def main(*args):
 
         # load models
         dnn_model = predict.load_models(input_dir="saved_model")
-        # load image and its metadata
+        # load image
         image = predict.load_image(image_path=args[2])
         # predict image class
         predict.predict_on_image(image=image,
-                                 dnn_model=dnn_model)
+                                 dnn_model=dnn_model,
+                                 classes_dict={0: "CLASS_0",
+                                               1: "CLASS_1",
+                                               2: "CLASS_2"}
+                                 )
     # training mode
     elif mode in ["train", "-train"]:
         if len(args) < 3:

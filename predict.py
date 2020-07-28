@@ -2,10 +2,7 @@ import os
 import cv2
 from keras.models import load_model
 import numpy as np
-
-classes_dict = {0: "CLASS_0",
-                1: "CLASS_1",
-                2: "CLASS_2"}
+import logging
 
 
 # load all models relevant to prediction #
@@ -19,21 +16,21 @@ def load_models(input_dir):
     if dnn_model_path is None:
         raise Exception("could not find a *.h5 file in %s" % input_dir)
     dnn_model = load_model(dnn_model_path)
-    print("dnn_model loaded successfully")
+    logging.info("dnn_model loaded successfully")
     return dnn_model
 
 
-# load image and metadata #
+# load image #
 def load_image(image_path):
     image = cv2.imread(image_path)
     if image is None:
         raise Exception("image %s is None, there was an error while loading" % image_path)
     image = np.expand_dims(image, axis=0)
-    print("image %s loaded successfully" % image_path)
+    logging.info("image %s loaded successfully" % image_path)
     return image
 
 
 # perform image class prediction using models and data #
-def predict_on_image(image, dnn_model):
+def predict_on_image(image, dnn_model, classes_dict):
     dnn_pred = int(np.argmax(dnn_model.predict(image), axis=1))
-    print("predicted_class: %s" % classes_dict[dnn_pred])
+    logging.info("predicted_class: %s" % classes_dict[dnn_pred])

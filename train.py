@@ -6,6 +6,7 @@ from keras.layers import Dense, Input, Flatten
 from sklearn.model_selection import train_test_split
 import time
 from utils import load_dataset, get_class_weighting, get_model_performance
+import logging
 
 
 # main training function #
@@ -44,7 +45,7 @@ def main(test_ratio, initial_learning_rate, num_classes, num_training_epochs, cl
     dnn_model = keras.Sequential(name="full_DNN")
     dnn_model_input = Input(shape=(H,W,3), name="dnn_model_input")
 
-    # use VGG16 model with imagenet weights as baseline #
+    # use VGG16 model with ImageNet weights as baseline #
     init_dnn_model = keras.applications.VGG16(
                                 include_top=False,
                                 input_tensor=dnn_model_input,
@@ -68,7 +69,7 @@ def main(test_ratio, initial_learning_rate, num_classes, num_training_epochs, cl
                         bias_regularizer=tf.keras.regularizers.l2(1e-8),
                     ))
 
-    # user Adam optmizer for speedy learning #
+    # user Adam optimizer for speedy learning #
     optimizer = keras.optimizers.Adam(learning_rate=initial_learning_rate)
     dnn_model.compile(loss='categorical_crossentropy',
                       optimizer=optimizer,
@@ -80,7 +81,7 @@ def main(test_ratio, initial_learning_rate, num_classes, num_training_epochs, cl
     test_sample_weights = get_class_weighting(labels=Y_test,
                                               num_classes_for_weighting=num_classes)
 
-    print("Starting dnn_model training...")
+    logging.info("Starting dnn_model training...")
     dnn_model.fit(
         x=X_train,
         y=Y_train,
@@ -96,7 +97,7 @@ def main(test_ratio, initial_learning_rate, num_classes, num_training_epochs, cl
     # save trained DNN model #
     dest_dir = "saved_model"
     os.makedirs(dest_dir, exist_ok=True)
-    print("Saving trained DNN model to \"saved_model\" directory..")
+    logging.info("Saving trained DNN model to \"saved_model\" directory..")
     dnn_model.save(os.path.join(dest_dir, "dnn_model.h5"))
 
     # evaluate classifier #
@@ -105,8 +106,8 @@ def main(test_ratio, initial_learning_rate, num_classes, num_training_epochs, cl
                                         y_to_test=Y_test,
                                         sample_weighting=test_sample_weights)
 
-    print("DNN model TEST performance:")
+    logging.info("DNN model TEST performance:")
     for key, val in model_stats.items():
-        print("{}: {}".format(key, val))
+        logging.info("{}: {}".format(key, val))
 
-    print("total run time: %g minutes" % ((time.time()-start_time)/60))
+    logging.info("total run time: %g minutes" % ((time.time()-start_time)/60))
