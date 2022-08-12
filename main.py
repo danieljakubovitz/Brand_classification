@@ -11,7 +11,7 @@ def main(args):
     logging.basicConfig(level=logging.DEBUG)
 
     # prediction mode
-    if args.mode in ["predict", "-predict"]:
+    if args.mode == "predict":
         if not os.path.isfile(args.image_path):
             raise ValueError(f"specified image path {args.image_path} is not valid")
 
@@ -27,7 +27,7 @@ def main(args):
                                                2: "CLASS_2"}
                                  )
     # training mode
-    elif args.mode in ["train"]:
+    elif args.mode == "train":
         if not args.baseline_dir:
             raise SyntaxError("path of dataset directory for training isn't specified")
 

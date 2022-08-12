@@ -41,13 +41,16 @@ def main(test_ratio, initial_learning_rate, num_classes, num_training_epochs, cl
                                                         random_state=42,
                                                         shuffle=True)
 
+    logging.info(f"Training set size: {len(X_train)} samples")
+    logging.info(f"Test set size: {len(X_test)} samples")
+
     # TRAIN A DNN FOR 3 CLASS CLASSIFICATION #
     dnn_model = keras.Sequential(name="full_DNN")
     dnn_model_input = Input(shape=(H,W,3), name="dnn_model_input")
 
     # use VGG16 model with ImageNet weights as baseline #
-    init_dnn_model = keras.applications.VGG16(
-                                include_top=False,
+    init_dnn_model = tf.keras.applications.VGG19(
+                                include_top=False, # do not include 3 FC layers at top of network
                                 input_tensor=dnn_model_input,
                                 weights="imagenet",
                                 input_shape=(H, W, 3),
@@ -70,10 +73,11 @@ def main(test_ratio, initial_learning_rate, num_classes, num_training_epochs, cl
                     ))
 
     # user Adam optimizer for speedy learning #
-    optimizer = keras.optimizers.Adam(learning_rate=initial_learning_rate)
+    optimizer = tf.keras.optimizers.Adam(learning_rate=initial_learning_rate)
     dnn_model.compile(loss='categorical_crossentropy',
                       optimizer=optimizer,
-                      metrics=['categorical_accuracy'])
+                      metrics=[tf.keras.metrics.CategoricalAccuracy(),
+                               tf.keras.metrics.AUC(curve="PR")])
 
     # get train and test sample weighting, according to class imbalance
     train_sample_weights = 100 * get_class_weighting(labels=Y_train,
@@ -99,6 +103,8 @@ def main(test_ratio, initial_learning_rate, num_classes, num_training_epochs, cl
     os.makedirs(dest_dir, exist_ok=True)
     logging.info("Saving trained DNN model to \"saved_model\" directory..")
     dnn_model.save(os.path.join(dest_dir, "dnn_model.h5"))
+    logging.info(f"Model saved to: {os.path.join(dest_dir, 'dnn_model.h5')}")
+
 
     # evaluate classifier #
     model_stats = get_model_performance(model_to_test=dnn_model,

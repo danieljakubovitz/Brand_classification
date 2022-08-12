@@ -8,7 +8,7 @@ import logging
 # load all models relevant to prediction #
 def load_models(input_dir):
     if not os.path.isdir(input_dir):
-        raise FileNotFoundError(f"The specified input_dir {input_dir} doesn't exist")
+        raise FileNotFoundError(f"The specified input_dir {input_dir} does not exist")
     dnn_model_path = None
     for file in os.listdir(input_dir):
         if file.endswith("h5"):
@@ -16,7 +16,7 @@ def load_models(input_dir):
     if dnn_model_path is None:
         raise FileNotFoundError(f"could not find a *.h5 file in {input_dir}")
     dnn_model = load_model(dnn_model_path)
-    logging.info("dnn_model loaded successfully")
+    logging.info(f"dnn_model loaded successfully from path: {dnn_model_path}")
     return dnn_model
 
 
