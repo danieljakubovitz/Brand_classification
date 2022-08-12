@@ -10,7 +10,7 @@ import logging
 
 
 # main training function #
-def main(test_ratio, initial_learning_rate, num_classes, num_training_epochs, classes_dict, baseline_dir):
+def main(test_ratio, learning_rate, num_classes, num_epochs, mini_batch_size, classes_dict, baseline_dir):
     start_time = time.perf_counter()  # run-time evaluation
 
     # csv file full path, and images dir full puth
@@ -73,7 +73,7 @@ def main(test_ratio, initial_learning_rate, num_classes, num_training_epochs, cl
                     ))
 
     # user Adam optimizer for speedy learning #
-    optimizer = tf.keras.optimizers.Adam(learning_rate=initial_learning_rate)
+    optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
     dnn_model.compile(loss='categorical_crossentropy',
                       optimizer=optimizer,
                       metrics=[tf.keras.metrics.CategoricalAccuracy(),
@@ -89,8 +89,8 @@ def main(test_ratio, initial_learning_rate, num_classes, num_training_epochs, cl
     dnn_model.fit(
         x=X_train,
         y=Y_train,
-        batch_size=32,
-        epochs=num_training_epochs,
+        batch_size=mini_batch_size,
+        epochs=num_epochs,
         verbose=1,
         validation_split=0.0,
         validation_data=(X_test, Y_test),

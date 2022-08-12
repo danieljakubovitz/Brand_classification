@@ -3,6 +3,7 @@ import predict
 import train
 import logging
 import argparse
+from constants import *
 
 
 # main run function
@@ -29,12 +30,14 @@ def main(args):
     # training mode
     elif args.mode == "train":
         if not args.baseline_dir:
-            raise SyntaxError("path of dataset directory for training isn't specified")
+            raise ValueError("path of dataset directory for training isn't specified")
 
-        train.main(test_ratio=0.1,
-                   initial_learning_rate=5e-5,
-                   num_classes=3,
-                   num_training_epochs=15,
+        logging.info(f"Training hyper-parameters: lr:{LEARNING_RATE}, batch_size:{BATCH_SIZE}, NUM_EPOCHS:{NUM_EPOCHS}, TEST_RATIO:{TEST_RATIO}")
+        train.main(test_ratio=TEST_RATIO,
+                   learning_rate=LEARNING_RATE,
+                   num_classes=NUM_CLASSES,
+                   num_epochs=NUM_EPOCHS,
+                   mini_batch_size=BATCH_SIZE,
                    classes_dict={"CLASS_0": 0,
                                  "CLASS_1": 1,
                                  "CLASS_2": 2},
