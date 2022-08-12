@@ -1,10 +1,10 @@
 ## General
 This repo includes a generic 3-class classification model (easily extendable to more classes).
-It includes the training of a DNN, using transfer learning from VGG-16 initialized with ImageNet.
+It includes the training of a DNN, using transfer learning from VGG-19 initialized with ImageNet.
 Sample loss weighting is incorporated to mitigate class imbalance during training.
 Hyper-parameter tuning is necessary to optimize performance.
 
-This repo is based on keras 2.4.3 + tensorflow backend 2.3.0.
+This repo is based on keras 2.6.0 + tensorflow backend 2.6.2.
 
 All training and test data should be aggregated in a directory, along with a csv file describing its contents using 2 fields:
 1. IMAGE_FILENAME (e.g. image.jpg)
