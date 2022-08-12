@@ -8,13 +8,13 @@ import logging
 # load all models relevant to prediction #
 def load_models(input_dir):
     if not os.path.isdir(input_dir):
-        raise Exception("The specified input_dir %s doesn't exist" % input_dir)
+        raise FileNotFoundError(f"The specified input_dir {input_dir} doesn't exist")
     dnn_model_path = None
     for file in os.listdir(input_dir):
         if file.endswith("h5"):
             dnn_model_path = os.path.join(input_dir, file)
     if dnn_model_path is None:
-        raise Exception("could not find a *.h5 file in %s" % input_dir)
+        raise FileNotFoundError(f"could not find a *.h5 file in {input_dir}")
     dnn_model = load_model(dnn_model_path)
     logging.info("dnn_model loaded successfully")
     return dnn_model
@@ -24,9 +24,9 @@ def load_models(input_dir):
 def load_image(image_path):
     image = cv2.imread(image_path)
     if image is None:
-        raise Exception("image %s is None, there was an error while loading" % image_path)
+        raise Exception(f"image {image_path} is None, there was an error while loading")
     image = np.expand_dims(image, axis=0)
-    logging.info("image %s loaded successfully" % image_path)
+    logging.info(f"image {image_path} loaded successfully")
     return image
 
 
