@@ -22,7 +22,7 @@ def load_dataset(csv_file, data_dir, cls_dict):
         image_path = os.path.join(data_dir, image_name)
         image = cv2.imread(image_path)
         if image is None:
-            raise Exception("image %s is None, there was an error while loading" % image_path)
+            raise FileNotFoundError(f"image {image_path} is None, there was an error while loading")
         image = np.expand_dims(image, axis=0)
 
         # initialize dataset arrays #
@@ -57,7 +57,7 @@ def get_model_performance(model_to_test, x_to_test, y_to_test, sample_weighting)
     y_pred = np.argmax(model_to_test.predict(x_to_test), axis=1)
     y_true = np.argmax(y_to_test, axis=1)
 
-    results = dict(
+    return dict(
             f1_score_micro=f1_score(y_true=y_true, y_pred=y_pred, average="micro"),
             f1_score_macro=f1_score(y_true=y_true, y_pred=y_pred, average="macro"),
             f1_score_weighted=f1_score(y_true=y_true, y_pred=y_pred, average="weighted"),
@@ -66,4 +66,3 @@ def get_model_performance(model_to_test, x_to_test, y_to_test, sample_weighting)
             matthews_corrcoef_weighted=matthews_corrcoef(y_true=y_true, y_pred=y_pred),
             classifier_confusion_matrix=confusion_matrix(y_true=y_true, y_pred=y_pred)
     )
-    return results

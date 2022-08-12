@@ -21,7 +21,7 @@ The saved model will appear in a "saved_model" directory.
 ### Inference:
 python main.py -predict image_to_predict_path
 
-### Evaluation metrics
+### Evaluation metrics:
 The trained model is evaluated using the following metrics:
 1. micro F1 score: representing the global F1 score of all the samples.
 2. macro F1 score: the unweighted average of the different classes' F1 scores.

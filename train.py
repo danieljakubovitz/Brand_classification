@@ -11,7 +11,7 @@ import logging
 
 # main training function #
 def main(test_ratio, initial_learning_rate, num_classes, num_training_epochs, classes_dict, baseline_dir):
-    start_time = time.time()  # run-time evaluation
+    start_time = time.perf_counter()  # run-time evaluation
 
     # csv file full path, and images dir full puth
     csv_file = None
@@ -22,9 +22,9 @@ def main(test_ratio, initial_learning_rate, num_classes, num_training_epochs, cl
         if os.path.isdir(os.path.join(baseline_dir, file)):
             data_dir = os.path.join(baseline_dir, file)
     if csv_file is None:
-        raise Exception("no csv_file was found")
+        raise FileNotFoundError("no csv_file was found")
     if data_dir is None:
-        raise Exception("no data_dir was found")
+        raise FileNotFoundError("no data_dir was found")
 
     # get all relevant data #
     dataset_images, dataset_labels = load_dataset(csv_file=csv_file,
@@ -108,6 +108,6 @@ def main(test_ratio, initial_learning_rate, num_classes, num_training_epochs, cl
 
     logging.info("DNN model TEST performance:")
     for key, val in model_stats.items():
-        logging.info("{}: {}".format(key, val))
+        logging.info(f"{key}: {val}")
 
-    logging.info("total run time: %g minutes" % ((time.time()-start_time)/60))
+    logging.info("total run time: %g minutes" % ((time.perf_counter()-start_time)/60))
