@@ -5,14 +5,16 @@ import numpy as np
 import logging
 import time
 
-# load all models relevant to prediction #
+
+# load first model relevant to prediction #
 def load_models(input_dir):
     if not os.path.isdir(input_dir):
         raise FileNotFoundError(f"The specified input_dir {input_dir} does not exist")
     dnn_model_path = None
-    for file in os.listdir(input_dir):
+    for file in sorted(os.listdir(input_dir)):
         if file.endswith("h5"):
             dnn_model_path = os.path.join(input_dir, file)
+            break
     if dnn_model_path is None:
         raise FileNotFoundError(f"could not find a *.h5 file in {input_dir}")
     load_start_time = time.perf_counter()
@@ -34,4 +36,4 @@ def load_image(image_path):
 # perform image class prediction using models and data #
 def predict_on_image(image, dnn_model, classes_dict):
     dnn_pred = int(np.argmax(dnn_model.predict(image), axis=1))
-    logging.info("predicted_class: %s" % classes_dict[dnn_pred])
+    logging.info(f"predicted_class: {classes_dict[dnn_pred]}")
