@@ -14,13 +14,14 @@ def main(args):
     # prediction mode
     if args.mode == "predict":
         if not os.path.isfile(args.image_path):
-            raise ValueError(f"specified image path {args.image_path} is not valid")
+            raise ValueError(f"the specified image path {args.image_path} is not valid")
 
         # load models
         dnn_model = predict.load_models(input_dir="saved_model")
         # load image
         image = predict.load_image(image_path=args.image_path)
         # predict image class
+        logging.info(f"Performing inference on {args.image_path}")
         predict.predict_on_image(image=image,
                                  dnn_model=dnn_model,
                                  classes_dict={0: "CLASS_0",

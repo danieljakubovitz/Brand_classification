@@ -3,7 +3,7 @@ import cv2
 from keras.models import load_model
 import numpy as np
 import logging
-
+import time
 
 # load all models relevant to prediction #
 def load_models(input_dir):
@@ -15,8 +15,9 @@ def load_models(input_dir):
             dnn_model_path = os.path.join(input_dir, file)
     if dnn_model_path is None:
         raise FileNotFoundError(f"could not find a *.h5 file in {input_dir}")
+    load_start_time = time.perf_counter()
     dnn_model = load_model(dnn_model_path)
-    logging.info(f"dnn_model loaded successfully from path: {dnn_model_path}")
+    logging.info(f"dnn_model: {dnn_model_path} loaded successfully in {time.perf_counter() - load_start_time:.3} seconds")
     return dnn_model
 
 
