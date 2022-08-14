@@ -9,6 +9,7 @@ from keras.layers import Dense, Input, Flatten
 from sklearn.metrics import f1_score, confusion_matrix, accuracy_score, matthews_corrcoef
 from tqdm import tqdm
 
+
 # load dataset using csv file, data_dir and classes dictionary
 def load_dataset(csv_file, data_dir, cls_dict):
     logging.info("Loading images and creating train and test sets...")
@@ -49,15 +50,15 @@ def get_class_weighting(class_split):
     normalized_class_weights = [x/sum(class_weights) for x in class_weights]
     return normalized_class_weights
 
+
 # get weighting vector matching sample vector dimensions
 def get_sample_weights(class_weights, y):
     y_integers = np.argmax(y, axis=1)
-    sample_weights = np.array(y_integers).copy()
+    sample_weights = np.array(y_integers, dtype=np.float16).copy()
     for class_idx, weight in enumerate(class_weights):
         indices = np.argwhere(np.array(class_idx) == y_integers).flatten()
         sample_weights[indices] = weight
     return sample_weights
-
 
 
 # gather key performance metrics #
@@ -74,6 +75,7 @@ def get_model_performance(model_to_test, x_to_test, y_to_test, sample_weighting)
             matthews_corrcoef_weighted=matthews_corrcoef(y_true=y_true, y_pred=y_pred),
             classifier_confusion_matrix=confusion_matrix(y_true=y_true, y_pred=y_pred)
     )
+
 
 # build DNN model #
 def build_model(input_shape, learning_rate, num_classes):

@@ -46,16 +46,14 @@ def main(test_ratio, learning_rate, num_classes, num_epochs, mini_batch_size, cl
     logging.info(f"Test set size: {len(X_test)} samples")
     logging.info(f"Test set class split: {test_class_split}")
 
-
     # get train and test sample weighting, according to class imbalance
     train_class_weights = get_class_weighting(class_split=train_class_split)
-    train_sample_weights = get_sample_weights(class_weights=train_class_weights, y=Y_train)
     logging.info(f"Training with class weighting: {train_class_weights}")
-    logging.info(f"Training with sample weighting: {train_sample_weights}")
+    train_sample_weights = get_sample_weights(class_weights=train_class_weights, y=Y_train)
 
     test_class_weights = get_class_weighting(class_split=test_class_split)
-    test_sample_weights = get_sample_weights(class_weights=test_class_weights, y=Y_test)
     logging.info(f"Testing with class weighting: {test_class_weights}")
+    test_sample_weights = get_sample_weights(class_weights=test_class_weights, y=Y_test)
 
     # TRAIN A DNN FOR N-CLASS CLASSIFICATION #
     logging.info("Starting dnn_model training...")
