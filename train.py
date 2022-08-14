@@ -1,19 +1,16 @@
 import os
 import numpy as np
-import tensorflow as tf
-import keras
-from keras.layers import Dense, Input, Flatten
-from sklearn.model_selection import train_test_split
-import time
-from utils import load_dataset, get_class_weighting, get_model_performance
 import logging
+import time
+from sklearn.model_selection import train_test_split
+from utils import load_dataset, get_class_weighting, get_sample_weights, get_model_performance, build_model
 
 
 # main training function #
 def main(test_ratio, learning_rate, num_classes, num_epochs, mini_batch_size, classes_dict, baseline_dir):
     start_time = time.perf_counter()  # run-time evaluation
 
-    # csv file full path, and images dir full puth
+    # csv file full path, and images dir full path
     csv_file = None
     data_dir = None
     for file in os.listdir(baseline_dir):
@@ -40,52 +37,31 @@ def main(test_ratio, learning_rate, num_classes, num_epochs, mini_batch_size, cl
                                                         test_size=test_ratio,
                                                         random_state=42,
                                                         shuffle=True)
+    # track class imbalance
+    train_class_split = [sum(Y_train[:, ii]) / np.sum(Y_train, axis=(0,1)) for ii in range(num_classes)]
+    test_class_split = [sum(Y_test[:, ii]) / np.sum(Y_test, axis=(0,1)) for ii in range(num_classes)]
 
     logging.info(f"Training set size: {len(X_train)} samples")
+    logging.info(f"Training set class split: {train_class_split}")
     logging.info(f"Test set size: {len(X_test)} samples")
+    logging.info(f"Test set class split: {test_class_split}")
 
-    # TRAIN A DNN FOR 3 CLASS CLASSIFICATION #
-    dnn_model = keras.Sequential(name="full_DNN")
-    dnn_model_input = Input(shape=(H,W,3), name="dnn_model_input")
-
-    # use VGG16 model with ImageNet weights as baseline #
-    init_dnn_model = tf.keras.applications.VGG19(
-                                include_top=False, # do not include 3 FC layers at top of network
-                                input_tensor=dnn_model_input,
-                                weights="imagenet",
-                                input_shape=(H, W, 3),
-                            )
-
-    # add fully connected layers in the end of the network #
-    dnn_model.add(init_dnn_model)
-    dnn_model.add(Flatten(name="flatten1"))  # make sure output is flat before FC layers
-    dnn_model.add(Dense(units=1024, activation="relu", name="FC1",
-                        kernel_regularizer=tf.keras.regularizers.l1_l2(l1=1e-8, l2=1e-8),
-                        bias_regularizer=tf.keras.regularizers.l2(1e-8),
-                        ))
-    dnn_model.add(Dense(units=256, activation="relu", name="FC2",
-                        kernel_regularizer=tf.keras.regularizers.l1_l2(l1=1e-8, l2=1e-8),
-                        bias_regularizer=tf.keras.regularizers.l2(1e-8),
-                        ))
-    dnn_model.add(Dense(units=num_classes, activation="softmax", name="FC3",
-                        kernel_regularizer=tf.keras.regularizers.l1_l2(l1=1e-8, l2=1e-8),
-                        bias_regularizer=tf.keras.regularizers.l2(1e-8),
-                    ))
-
-    # user Adam optimizer for speedy learning #
-    optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
-    dnn_model.compile(loss='categorical_crossentropy',
-                      optimizer=optimizer,
-                      metrics=[tf.keras.metrics.CategoricalAccuracy(),
-                               tf.keras.metrics.AUC(curve="PR")])
 
     # get train and test sample weighting, according to class imbalance
-    train_sample_weights = 100 * get_class_weighting(labels=Y_train,
-                                                     num_classes_for_weighting=num_classes)
-    test_sample_weights = get_class_weighting(labels=Y_test,
-                                              num_classes_for_weighting=num_classes)
+    train_class_weights = get_class_weighting(class_split=train_class_split)
+    train_sample_weights = get_sample_weights(class_weights=train_class_weights, y=Y_train)
+    logging.info(f"Training with class weighting: {train_class_weights}")
+    logging.info(f"Training with sample weighting: {train_sample_weights}")
 
+    test_class_weights = get_class_weighting(class_split=test_class_split)
+    test_sample_weights = get_sample_weights(class_weights=test_class_weights, y=Y_test)
+    logging.info(f"Testing with class weighting: {test_class_weights}")
+
+    # TRAIN A DNN FOR N-CLASS CLASSIFICATION #
     logging.info("Starting dnn_model training...")
+    dnn_model = build_model(input_shape=(H,W,3),
+                            learning_rate=learning_rate,
+                            num_classes=num_classes)
     dnn_model.fit(
         x=X_train,
         y=Y_train,
@@ -93,7 +69,7 @@ def main(test_ratio, learning_rate, num_classes, num_epochs, mini_batch_size, cl
         epochs=num_epochs,
         verbose=1,
         validation_split=0.0,
-        validation_data=(X_test, Y_test),
+        validation_data=(X_test, Y_test, test_sample_weights),
         shuffle=True,
         sample_weight=train_sample_weights,
     )
