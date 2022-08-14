@@ -41,16 +41,15 @@ def main(test_ratio, learning_rate, num_classes, num_epochs, mini_batch_size, cl
     train_class_split = [sum(Y_train[:, ii]) / np.sum(Y_train, axis=(0,1)) for ii in range(num_classes)]
     test_class_split = [sum(Y_test[:, ii]) / np.sum(Y_test, axis=(0,1)) for ii in range(num_classes)]
 
+    # get train and test sample weighting, according to class imbalance
     logging.info(f"Training set size: {len(X_train)} samples")
     logging.info(f"Training set class split: {train_class_split}")
-    logging.info(f"Test set size: {len(X_test)} samples")
-    logging.info(f"Test set class split: {test_class_split}")
-
-    # get train and test sample weighting, according to class imbalance
     train_class_weights = get_class_weighting(class_split=train_class_split)
     logging.info(f"Training with class weighting: {train_class_weights}")
     train_sample_weights = get_sample_weights(class_weights=train_class_weights, y=Y_train)
 
+    logging.info(f"Test set size: {len(X_test)} samples")
+    logging.info(f"Test set class split: {test_class_split}")
     test_class_weights = get_class_weighting(class_split=test_class_split)
     logging.info(f"Testing with class weighting: {test_class_weights}")
     test_sample_weights = get_sample_weights(class_weights=test_class_weights, y=Y_test)
