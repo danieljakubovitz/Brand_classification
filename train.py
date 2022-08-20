@@ -7,14 +7,14 @@ from utils import load_dataset, get_class_weighting, get_sample_weights, get_mod
 
 
 # main training function #
-def main(test_ratio, learning_rate, num_classes, num_epochs, mini_batch_size, classes_dict, baseline_dir):
+def main(test_ratio, learning_rate, num_classes, num_epochs, mini_batch_size, str_to_int_classes_dict, baseline_dir):
     """
     :param test_ratio - ration of test set out of total
     :param learning_rate - learning rate for optimization algorithm
     :param num_classes - number of classes in the classification task
     :param num_epochs - number of epochs to train model
     :param mini_batch_size - size of mini-batch to use throughout training
-    :param classes_dict - dictionary of possible classification classes
+    :param str_to_int_classes_dict - dictionary of possible classification classes
     :param baseline_dir - directory where input data resides
     :return:
     """
@@ -36,7 +36,7 @@ def main(test_ratio, learning_rate, num_classes, num_epochs, mini_batch_size, cl
     # build dataset #
     dataset_images, dataset_labels = load_dataset(csv_file=csv_file,
                                                   data_dir=data_dir,
-                                                  cls_dict=classes_dict)
+                                                  str_to_int_classes_dict=str_to_int_classes_dict)
 
     # get input image shape #
     H, W = np.shape(dataset_images)[1:3]

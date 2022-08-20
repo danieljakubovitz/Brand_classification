@@ -14,12 +14,16 @@ The data directory should include the csv file and an "images" directory with th
 The dictionary classes_dict in the main file should match the classes in the dataset csv file.
 
 ### Training:
-python main.py -train data_directory_path
+command line example:
+
+python main.py --mode train --baseline_dir "data"
 
 The saved model will appear in a "saved_model" directory.
 
 ### Inference:
-python main.py -predict image_to_predict_path
+command line example:
+
+python main.py --mode predict --image_path "data/images/image_0.jpg"
 
 ### Evaluation metrics:
 The trained model is evaluated using the following metrics:

@@ -28,7 +28,7 @@ def main(args):
         logging.info(f"Performing inference on {args.image_path}")
         predict.predict_on_image(image=image,
                                  dnn_model=dnn_model,
-                                 classes_dict=CLASSES_DICT)
+                                 int_to_str_classes_dict=INT_TO_STR_CLASSES_DICT)
     # training mode
     elif args.mode == "train":
         if not args.baseline_dir:
@@ -42,7 +42,7 @@ def main(args):
                    num_classes=NUM_CLASSES,
                    num_epochs=NUM_EPOCHS,
                    mini_batch_size=BATCH_SIZE,
-                   classes_dict=CLASSES_DICT,
+                   str_to_int_classes_dict=STR_TO_INT_CLASSES_DICT,
                    baseline_dir=args.baseline_dir)
 
     # illegal mode

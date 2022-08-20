@@ -44,12 +44,12 @@ def load_image(image_path):
 
 
 # perform image class prediction using models and data #
-def predict_on_image(image, dnn_model, classes_dict):
+def predict_on_image(image, dnn_model, int_to_str_classes_dict):
     """
     :param image - image to perform inference on
     :param dnn_model - model to perform inference with
-    :param classes_dict - dictionary of possible classification classes
+    :param int_to_str_classes_dict - dictionary of possible classification classes
     :return:
     """
     dnn_pred = int(np.argmax(dnn_model.predict(image), axis=1))
-    logging.info(f"predicted_class: {classes_dict[dnn_pred]}")
+    logging.info(f"predicted_class: {int_to_str_classes_dict[dnn_pred]}")

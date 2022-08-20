@@ -11,11 +11,11 @@ from tqdm import tqdm
 
 
 # load dataset using csv file, data_dir and classes dictionary
-def load_dataset(csv_file, data_dir, cls_dict):
+def load_dataset(csv_file, data_dir, str_to_int_classes_dict):
     """
     :param csv_file - csv file detailing the data to load
     :param data_dir - directory where data to load resides
-    :param cls_dict - dictionary of possible classification classes
+    :param str_to_int_classes_dict - dictionary of possible classification classes
     :return dataset_images - images in the dataset
     :return: dataset_labels - labels of the dataset
     """
@@ -27,7 +27,7 @@ def load_dataset(csv_file, data_dir, cls_dict):
             image_label_dict[row["IMAGE_FILENAME"].strip()] = row["LABEL"].strip()
 
     # get parameters
-    num_classes = len(cls_dict)
+    num_classes = len(str_to_int_classes_dict)
     image_names = sorted(os.listdir(data_dir))
     dataset_images, dataset_labels = None, None
     # iteratively read images and build the dataset
@@ -46,7 +46,7 @@ def load_dataset(csv_file, data_dir, cls_dict):
 
         # process label - one-hot encoding #
         label = np.zeros((1, num_classes))
-        label[:, cls_dict[image_label_dict[image_name]]] = 1
+        label[:, str_to_int_classes_dict[image_label_dict[image_name]]] = 1
 
         # aggregate to dataset #
         dataset_images = np.concatenate((dataset_images, image), axis=0)
