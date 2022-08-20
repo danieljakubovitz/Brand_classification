@@ -8,11 +8,21 @@ from utils import load_dataset, get_class_weighting, get_sample_weights, get_mod
 
 # main training function #
 def main(test_ratio, learning_rate, num_classes, num_epochs, mini_batch_size, classes_dict, baseline_dir):
-    start_time = time.perf_counter()  # run-time evaluation
+    """
+    :param test_ratio - ration of test set out of total
+    :param learning_rate - learning rate for optimization algorithm
+    :param num_classes - number of classes in the classification task
+    :param num_epochs - number of epochs to train model
+    :param mini_batch_size - size of mini-batch to use throughout training
+    :param classes_dict - dictionary of possible classification classes
+    :param baseline_dir - directory where input data resides
+    :return:
+    """
+    # run-time evaluation
+    start_time = time.perf_counter()
 
-    # csv file full path, and images dir full path
-    csv_file = None
-    data_dir = None
+    # find csv file full path, and images dir full path
+    csv_file, data_dir = None, None
     for file in os.listdir(baseline_dir):
         if file.endswith("csv"):
             csv_file = os.path.join(baseline_dir, file)
@@ -23,7 +33,7 @@ def main(test_ratio, learning_rate, num_classes, num_epochs, mini_batch_size, cl
     if data_dir is None:
         raise FileNotFoundError("no data_dir was found")
 
-    # get all relevant data #
+    # build dataset #
     dataset_images, dataset_labels = load_dataset(csv_file=csv_file,
                                                   data_dir=data_dir,
                                                   cls_dict=classes_dict)
@@ -31,7 +41,7 @@ def main(test_ratio, learning_rate, num_classes, num_epochs, mini_batch_size, cl
     # get input image shape #
     H, W = np.shape(dataset_images)[1:3]
 
-    # split to data to train and test, while keeping class ratio in both train and test #
+    # split data to train and test sets, while maintaining the same class ratio in both train and test sets #
     X_train, X_test, Y_train, Y_test = train_test_split(dataset_images, dataset_labels,
                                                         stratify=dataset_labels,
                                                         test_size=test_ratio,
@@ -54,11 +64,13 @@ def main(test_ratio, learning_rate, num_classes, num_epochs, mini_batch_size, cl
     logging.info(f"Testing with class weighting: {test_class_weights}")
     test_sample_weights = get_sample_weights(class_weights=test_class_weights, y=Y_test)
 
-    # TRAIN A DNN FOR N-CLASS CLASSIFICATION #
+    ### TRAIN A DNN FOR N-CLASS CLASSIFICATION ###
     logging.info("Starting dnn_model training...")
+    # get the DNN model itself
     dnn_model = build_model(input_shape=(H,W,3),
                             learning_rate=learning_rate,
                             num_classes=num_classes)
+    # train the DNN model
     dnn_model.fit(
         x=X_train,
         y=Y_train,
@@ -74,19 +86,20 @@ def main(test_ratio, learning_rate, num_classes, num_epochs, mini_batch_size, cl
     # save trained DNN model #
     dest_dir = "saved_model"
     os.makedirs(dest_dir, exist_ok=True)
-    logging.info("Saving trained DNN model to \"saved_model\" directory..")
+    logging.info(f"Saving trained DNN model to {dest_dir} directory..")
     dnn_model.save(os.path.join(dest_dir, "dnn_model.h5"))
     logging.info(f"Model saved to: {os.path.join(dest_dir, 'dnn_model.h5')}")
 
-
-    # evaluate classifier #
+    # evaluate classifier on test set #
     model_stats = get_model_performance(model_to_test=dnn_model,
                                         x_to_test=X_test,
                                         y_to_test=Y_test,
                                         sample_weighting=test_sample_weights)
 
+    # log model performance on the test set #
     logging.info("DNN model TEST performance:")
     for key, val in model_stats.items():
         logging.info(f"{key}: {val}")
 
+    # log the runtime
     logging.info("total run time: %g minutes" % ((time.perf_counter()-start_time)/60))

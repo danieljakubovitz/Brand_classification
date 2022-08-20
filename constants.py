@@ -3,3 +3,6 @@ LEARNING_RATE = 1e-6
 BATCH_SIZE = 16
 NUM_EPOCHS = 10
 TEST_RATIO = 0.1
+CLASSES_DICT = {0: "CLASS_0",
+                1: "CLASS_1",
+                2: "CLASS_2"}
