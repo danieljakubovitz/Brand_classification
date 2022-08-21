@@ -11,7 +11,7 @@ All training and test data should be aggregated in a directory, along with a csv
 2. LABEL (class name, e.g. CLASS_0)
 
 The data directory should include the csv file and an "images" directory with the images themselves.
-The dictionary classes_dict in the main file should match the classes in the dataset csv file.
+The dictionary INT_TO_STR_CLASSES_DICT in the constants.py file should match the classes in the dataset csv file.
 
 ### Training:
 command line example:
