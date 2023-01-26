@@ -1,6 +1,6 @@
 ## General
 This repo includes a generic 3-class classification model (easily extendable to more classes).
-It includes the training of a DNN, using transfer learning from VGG-19 initialized with ImageNet.
+It includes the training of a DNN, using transfer learning from EfficientNetB3 initialized with ImageNet.
 Sample loss weighting is incorporated to mitigate class imbalance during training.
 Hyper-parameter tuning is necessary to optimize performance.
 

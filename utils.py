@@ -116,9 +116,9 @@ def build_model(input_shape, learning_rate, num_classes):
     dnn_model = keras.Sequential(name="full_DNN")
     dnn_model_input = Input(shape=input_shape, name="dnn_model_input")
 
-    # use VGG19 model with ImageNet weights as baseline #
-    init_dnn_model = tf.keras.applications.VGG19(
-                                include_top=False, # do not include 3 FC layers at top of network
+    # use EfficientNetB3 model with ImageNet weights as baseline #
+    init_dnn_model = tf.keras.applications.EfficientNetB3(
+                                include_top=False,  # do not include the FC layer at top of network
                                 input_tensor=dnn_model_input,
                                 weights="imagenet",
                                 input_shape=input_shape,
